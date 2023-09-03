@@ -23,6 +23,9 @@ import {theme} from '../theme/tailwind.config';
 import HeaderBar from '../UIComponents/HeaderBar';
 import ToggleButton from '../UIComponents/ToggleButton';
 import ShowCoverSection from '../UIComponents/ShowCoverSection';
+import useStore from '../store/useStore';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+
 export default function ViewMovieOrTVShowScreen() {
   const [selectedOption, setSelectedOption] = useState('CASTCREW');
   const [searchTermRef, setSearchTermRef] = useState<any>('');
@@ -62,7 +65,7 @@ export default function ViewMovieOrTVShowScreen() {
     isError: detailsError,
     error: detailsErrorData,
   } = useGetDetails(selectedShowID);
-
+  const {adMobIds} = useStore()
   return (
     <View
       style={[tw`bg-black h-full w-full  `, {paddingBottom: safeArea.bottom}]}>
@@ -79,6 +82,8 @@ export default function ViewMovieOrTVShowScreen() {
         loading={loading}
       />
       <View style={tw` w-full flex-1`}>
+      {adMobIds?.ADMOB_BANNER_DETAIL && <BannerAd unitId={adMobIds?.ADMOB_BANNER_DETAIL } size={BannerAdSize.FULL_BANNER}/>}
+
         {detailsLoading ? (
           <View style={tw`h-full w-full  justify-center items-center`}>
             {/* <ActivityIndicator

@@ -12,10 +12,12 @@ import {useMoviesAndShows} from '../hooks/useMoviesAndShows';
 import {path_to_tmdbUri} from '../services/apiService';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProgressBar, {renderProgressBar} from '../UIComponents/ProgressBar';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import useStore from '../store/useStore';
 
 export default function TVTracker() {
   const {trackedShows, setSelectedShow, setSelectedType} = useMoviesAndShows();
-
+const {adMobIds} =useStore()
   const renderEpisodeInfoButton = (numerator: number, denominator: number) => {
     return (
       <View style={tw`flex-1 flex-row items-center`}>
@@ -71,6 +73,7 @@ export default function TVTracker() {
 
   return (
     <View style={tw`bg-black h-full w-full `}>
+      {adMobIds?.ADMOB_BANNER_HOME && <BannerAd unitId={adMobIds?.ADMOB_BANNER_HOME} size={BannerAdSize.FULL_BANNER}/>}
       {!trackedShows || trackedShows.length === 0 ? (
         <View style={tw`flex-1 w-full items-center justify-center`}>
           <Text style={tw`text-lightgrey text-center`}>
