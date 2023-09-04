@@ -73,7 +73,8 @@ const {adMobIds} =useStore()
 
   return (
     <View style={tw`bg-black h-full w-full `}>
-      {adMobIds?.ADMOB_BANNER_HOME && <BannerAd unitId={adMobIds?.ADMOB_BANNER_HOME} size={BannerAdSize.FULL_BANNER}/>}
+      {adMobIds?.ADMOB_BANNER_DETAIL && <View style={tw`w-full items-center justify-center`}><BannerAd unitId={adMobIds?.ADMOB_BANNER_HOME} size={BannerAdSize.BANNER} /></View>}
+
       {!trackedShows || trackedShows.length === 0 ? (
         <View style={tw`flex-1 w-full items-center justify-center`}>
           <Text style={tw`text-lightgrey text-center`}>
