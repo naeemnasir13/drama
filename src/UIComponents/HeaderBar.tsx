@@ -34,7 +34,7 @@ export default function HeaderBar(props: headerBarProps) {
     if (!adMobIds?.ADMOB_INTER_DETAIL && route.name !=='ViewMovieOrTVShowScreen') {
       return
     }
-   let interstitialAd = InterstitialAd.createForAdRequest(adMobIds?.ADMOB_INTER_SPLASH)
+   let interstitialAd = InterstitialAd.createForAdRequest(adMobIds?.ADMOB_INTER_DETAIL)
 
     const unsubscribe = interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
       setLoaded(interstitialAd)
