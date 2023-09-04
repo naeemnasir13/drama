@@ -12,6 +12,9 @@ import {navigationRef} from '../navigation/navigationRoot';
 import tw from '../theme/tailwind';
 import {theme} from '../theme/tailwind.config';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import useStore from '../store/useStore';
+import { useRoute } from '@react-navigation/native';
+import { InterstitialAd, AdEventType} from 'react-native-google-mobile-ads';
 
 // import {hStyles} from './headerStyles';
 type headerBarProps = {
@@ -23,7 +26,27 @@ type headerBarProps = {
 };
 export default function HeaderBar(props: headerBarProps) {
   const sfi = useSafeAreaInsets();
+  const {adMobIds} = useStore()
+  const route = useRoute();
+  const [loaded, setLoaded] = React.useState<InterstitialAd>();
 
+  React.useEffect(() => {
+    if (!adMobIds?.ADMOB_INTER_DETAIL && route.name !=='ViewMovieOrTVShowScreen') {
+      return
+    }
+   let interstitialAd = InterstitialAd.createForAdRequest(adMobIds?.ADMOB_INTER_SPLASH)
+
+    const unsubscribe = interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+      setLoaded(interstitialAd)
+    });
+
+    // Start loading the interstitial straight away
+    interstitialAd.load();
+
+    // Unsubscribe from events on unmount
+    return unsubscribe;
+  }, [adMobIds?.ADMOB_INTER_DETAIL])
+  
   return (
     <View
       style={[
@@ -34,7 +57,12 @@ export default function HeaderBar(props: headerBarProps) {
         <TouchableOpacity
           style={tw`bg-header/20 flex-row p-2 rounded-2 absolute left-0 top-1/5 items-center`}
           onPress={() => {
+            if(route.name=='ViewMovieOrTVShowScreen' && loaded){
+              loaded.show();
+            };
+
             navigationRef.goBack();
+
           }}>
           <Ionicons
             name="ios-chevron-back-sharp"

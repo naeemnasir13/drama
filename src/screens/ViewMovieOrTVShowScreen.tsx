@@ -81,8 +81,8 @@ export default function ViewMovieOrTVShowScreen() {
         tracked={getTrackedIndicator(selectedShow)}
         loading={loading}
       />
-      <View style={tw` w-full flex-1`}>
-      {adMobIds?.ADMOB_BANNER_DETAIL && <BannerAd unitId={adMobIds?.ADMOB_BANNER_DETAIL } size={BannerAdSize.FULL_BANNER}/>}
+      <View style={tw` w-full flex-1 relative`}>
+      {adMobIds?.ADMOB_BANNER_DETAIL && <View style={tw`absolute z-20 top-1/2`}><BannerAd unitId={adMobIds?.ADMOB_BANNER_DETAIL} size={BannerAdSize.FULL_BANNER} /></View>}
 
         {detailsLoading ? (
           <View style={tw`h-full w-full  justify-center items-center`}>
