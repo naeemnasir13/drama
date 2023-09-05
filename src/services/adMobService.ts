@@ -17,14 +17,16 @@ export const useAdMobService = () => {
     await mobileAds().initialize().catch(err => console.log(err));
     let getAdMobIds = await getAdIds().catch(err => console.log(err))
     setAdMobIds({ ...getAdMobIds })
-
-    const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY)
-    switch (result) {
-      case RESULTS.DENIED: {
-        await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
-        setLoaded(true);
-        return;
-      }
+    if (!getAdMobIds?.ADMOB_INTER_SPLASH) {
+      setLoaded(true);
+      return;
+    }
+    const checkPermission = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY)
+    let reqResult = 'denied'
+    switch (checkPermission) {
+      case RESULTS.DENIED: 
+        reqResult =  await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+        break;
       case RESULTS.LIMITED:
         options.requestNonPersonalizedAdsOnly = true
         break;
@@ -35,11 +37,11 @@ export const useAdMobService = () => {
         options.requestNonPersonalizedAdsOnly = true
         break;
     }
-    if (!getAdMobIds?.ADMOB_INTER_SPLASH) {
-      setLoaded(true);
-      return;
+   console.log(reqResult)
+    if(reqResult!==RESULTS.DENIED || checkPermission!==RESULTS.DENIED){
+      let interstitialAdInit =InterstitialAd.createForAdRequest(getAdMobIds?.ADMOB_INTER_SPLASH, { ...options })
+      setInterstitialAd(interstitialAdInit)
     }
-    setInterstitialAd(InterstitialAd.createForAdRequest(getAdMobIds?.ADMOB_INTER_SPLASH, { ...options }))
   }
   React.useEffect(() => {
     adMobInit()
@@ -50,13 +52,14 @@ export const useAdMobService = () => {
     if (!adMobIds?.OPEN_ADS) {
       return;
     }
-    let appOpenAd = AppOpenAd.createForAdRequest(adMobIds?.OPEN_ADS, { ...options });
-    const subscription = AppState.addEventListener('change', async(nextAppState) => {
-      const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY)
-      if(result==RESULTS.DENIED){
-        return
-      }
 
+    let appOpenAd = AppOpenAd.createForAdRequest(adMobIds?.OPEN_ADS, { ...options });
+    
+    const subscription = AppState.addEventListener('change', async(nextAppState) => {    
+    const result = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY)
+    if(result==RESULTS.DENIED){
+      return
+    }
       if (
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active'
@@ -66,7 +69,7 @@ export const useAdMobService = () => {
           appOpenAd.show();
         })
       }
-          if(nextAppState.match(/inactive/)){
+          if(nextAppState.match(/background/)){
           appOpenAd.load();
 
           }
@@ -76,21 +79,18 @@ export const useAdMobService = () => {
 
     return () => {
       subscription.remove();
-      appOpenAd.removeAllListeners()
     };
   }, [adMobIds?.OPEN_ADS])
 
   React.useEffect(() => {
-    console.log('adMob useEffect');
     if (!interstitialAd) {
       return
-    }
+    }    
+    console.log('adMob useEffect');
     const unsubscribe = interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
       interstitialAd.show();
       setLoaded(true);
     });
-
-    // Start loading the interstitial straight away
     interstitialAd.load();
 
     // Unsubscribe from events on unmount

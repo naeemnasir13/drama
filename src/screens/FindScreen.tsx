@@ -16,6 +16,8 @@ import {
 } from '../services/apiService';
 import {useMoviesAndShows} from '../hooks/useMoviesAndShows';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import useStore from '../store/useStore';
 
 import {useEffect, useState} from 'react';
 import MovieCard from '../UIComponents/MovieCard';
@@ -27,6 +29,7 @@ import {navigationRef} from '../navigation/navigationRoot';
 export default function ViewMovieOrTVShowScreen() {
   const [showData, setShowData] = useState<any>();
   const [finalData, setFinalData] = useState<any>();
+  const {adMobIds} =useStore()
 
   const [searchTermRef, setSearchTermRef] = useState<any>('');
   const [searchTerm, setSearchTerm] = useState<any>('');
@@ -130,6 +133,8 @@ export default function ViewMovieOrTVShowScreen() {
 
   return (
     <View style={tw`bg-black `}>
+            {adMobIds?.ADMOB_BANNER_DETAIL && <View style={tw`w-full items-center justify-center`}><BannerAd unitId={adMobIds?.ADMOB_BANNER_HOME} size={BannerAdSize.BANNER} /></View>}
+
       <View style={tw`mx-3 h-full `}>
         {MovieTypeToggle()}
         <View style={tw`bg-header rounded-2 flex-row items-center px-2`}>
